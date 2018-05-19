@@ -3,6 +3,7 @@ An improved version of "Xyphos," my primitive text file compression algorithm. T
 
 # why is it better?
 There are several reasons.
+
 	- Time complexity: 
 
 	- Lossless: my old program doesn't conserve the case of letters. This
@@ -15,3 +16,5 @@ both my program's efficiency and my top-tier project naming skills.
 
 # info
 See this link for more information: https://www2.cs.duke.edu/csed/poop/huff/info/
+
+This program isn't done yet.
