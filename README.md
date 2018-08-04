@@ -15,6 +15,9 @@ There are several reasons.
 	- Lossless: my old program doesn't conserve the case of letters. This
 	  program saves everything.
 
+    - Jack Black: Jack Black is actually a spokesman for Binary Xyphos.
+      Sorry, that was a lie.
+
     - Low-level: Xyphos is written in Python, a high-level interpreted pro-
       gramming language implemented in C. Binary Xyphos is written in pure
       C, so it'll suffer from less overhead.
@@ -24,6 +27,14 @@ a lower level. In Xyphos, I tried compressing without considering any
 information below text level; in Binary Xyphos, I'm compressing at the
 binary level. This showcases both my program's efficiency and my 
 top-tier project naming skills.
+
+# overhead
+To be honest, I actually don't know how much better the overhead will be
+for Binary Xyphos vs. original Xyphos. The original Xyphos just placed a lot of
+text representing the redundancy dictionary in the top part, where Binary Xyphos
+will place some bit-level header in all .xyp files. This leads me to believe that
+Binary Xyphos will have less overhead in compressed files, but I won't know just
+how much until I get a little further.
 
 # info
 See this link for more information: https://www2.cs.duke.edu/csed/poop/huff/info/
