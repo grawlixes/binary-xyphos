@@ -4,17 +4,28 @@ An improved version of "Xyphos," my primitive text file compression algorithm. T
 # why is it better?
 There are several reasons.
 
-	- Time complexity: 
+    - Efficiency: Huffman Coding, though old, is certainly better than the
+      dictionary assignment I used in Xyphos to represent redundancies.
+      So, more file space will be saved with binary-xyphos.
+
+	- Time complexity: my old program uses some very primitive string methods
+      several times over, making it pretty slow. I expect this one to
+      compress in much less time. 
 
 	- Lossless: my old program doesn't conserve the case of letters. This
 	  program saves everything.
 
-These improvements exist because I am compressing files at a lower level. In
-Xyphos, I tried compressing without considering any information below text
-level; in Binary Xyphos, I'm compressing at the binary level. This showcases
-both my program's efficiency and my top-tier project naming skills.
+    - Low-level: Xyphos is written in Python, a high-level interpreted pro-
+      gramming language implemented in C. Binary Xyphos is written in pure
+      C, so it'll suffer from less overhead.
+
+In fact, these improvements really exist because I am compressing files at 
+a lower level. In Xyphos, I tried compressing without considering any
+information below text level; in Binary Xyphos, I'm compressing at the
+binary level. This showcases both my program's efficiency and my 
+top-tier project naming skills.
 
 # info
 See this link for more information: https://www2.cs.duke.edu/csed/poop/huff/info/
 
-This program isn't done yet.
+This program isn't done yet!
