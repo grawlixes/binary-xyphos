@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <stdio.h>
+
 /* Node: represents the nodes of a Huffman tree
 
    A node will only have a char 'c' associated
@@ -6,13 +9,9 @@
 					     */
 struct Node;
 
-
-
 // print_usage_string() (void): prints the correct way of calling the
 // executable to stout
 void print_usage_string();
-
-
 
 int main(int argc, char * argv[]) {
 	// read through the file to get the count of all numbers
@@ -24,32 +23,26 @@ int main(int argc, char * argv[]) {
 
 	
 
-
-
-
 	return 0;
 }
 
-
-
 void print_usage_string() {
-	printf("./binary_xyphos <input_file_name>\ninput_file_name should 
-		be the name of a text file.");
+	printf("./binary_xyphos <input_file_name>\ninput_file_name should be the name of a text file.\n");
 	exit(1);
 }
 
 struct Node {
 	// count (int): the number of times that every character in the
 	// subtree at this node's root occur in the program
-	int count = 0;
+	int count;
 
 	// left (Node): the left subnode of this Node, if it exists
-	Node left = NULL;
+	struct Node * left;
 
 	// right (Node): same as above but the right subnode, if it exists
-	Node right = NULL;
+	struct Node * right;
 
 	// c (char): the character of this Node, if it exists
-	char c = "";
+	char c;
 };
 

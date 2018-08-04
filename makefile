@@ -11,7 +11,10 @@
 #	 NOTE: the output file will have ".xyp" appended to it to
 #	 ensure it is well-formed for the decompressor
 
-
+compress : compress.o
+	gcc -g -Wall compress.o -o compress
+compress.o : compress.c
+	gcc -c compress.c
 
 # the decompressor
  
@@ -19,5 +22,9 @@
 # 	 the file is a special ".xyp" file made by the compressor
 
 
+
+# clean
+clean :
+	rm -f compress compress.o
 
 # instructions go here #
