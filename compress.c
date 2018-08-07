@@ -11,24 +11,37 @@ struct Node;
 
 // print_usage_string() (void): prints the correct way of calling the
 // executable to stout
-void print_usage_string();
+void printUsageString();
+
+// getChar(int i) (char): returns the ASCII character of the value i
+char getChar(int i);
+
+// getInt(char c) (int): returns the ASCII value of the character c
+int getInt(char c);
 
 int main(int argc, char * argv[]) {
 	// read through the file to get the count of all numbers
 
-	if (argc != 2) {
+    if (argc != 2) {
 		printf("Incorrect number of arguments. See usage string:\n");
-		print_usage_string();
+		printUsageString();
 	}
 
-	
+    // file I/O
+	char * fileName = argv[1];
+    FILE * f = fopen(fileName, "r");
+    if (!f) {
+        printf("File not found in this directory. See usage string:\n");
+        printUsageString();
+    }
 
+    // supports all ASCII characters
+    int map[95] = {0};
+
+    // go line-by-line, char-by-char and fill up the map
+
+    fclose(f);
 	return 0;
-}
-
-void print_usage_string() {
-	printf("./binary_xyphos <input_file_name>\ninput_file_name should be the name of a text file.\n");
-	exit(1);
 }
 
 struct Node {
@@ -46,3 +59,15 @@ struct Node {
 	char c;
 };
 
+void printUsageString() {
+	printf("./binary_xyphos <input_file_name>\ninput_file_name should be the name of a text file.\n");
+	exit(1);
+}
+
+char getChar(int i) {
+    return (char) i;
+}
+
+int getInt(char c) {
+    return (int) c;
+}
