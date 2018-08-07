@@ -31,7 +31,7 @@ top-tier project naming skills.
 # overhead
 To be honest, I actually don't know how much better the overhead will be
 for Binary Xyphos vs. original Xyphos. The original Xyphos just placed a lot of
-text representing the redundancy dictionary in the top part, where Binary Xyphos
+text representing the redundancy dictionary in the top of all files, where Binary Xyphos
 will place some bit-level header in all .xyp files. This leads me to believe that
 Binary Xyphos will have less overhead in compressed files, but I won't know just
 how much until I get a little further.
