@@ -1,13 +1,7 @@
-#include <stdlib.h>
+#include "Node.h"
+
 #include <stdio.h>
-
-/* Node: represents the nodes of a Huffman tree
-
-   A node will only have a char 'c' associated
-   with it if it has neither a left nor a right
-   subtree, i.e. the node is a leaf node.
-					     */
-struct Node;
+#include <string.h>
 
 // print_usage_string() (void): prints the correct way of calling the
 // executable to stout
@@ -36,28 +30,53 @@ int main(int argc, char * argv[]) {
     }
 
     // supports all ASCII characters
-    int map[95] = {0};
+    int map[128] = {0};
 
     // go line-by-line, char-by-char and fill up the map
+    char * line = NULL;
+    size_t len;
+    int nodeArrayLength = 0;
+    while (getline(&line, &len, f) != -1) {
+        long unsigned int i;
+        for (i = 0 ; i < strlen(line) ; i++) {
+            if (map[getInt(line[i])] == 0) {
+                nodeArrayLength++;
+            }
+            map[getInt(line[i])]++;
+        }
+    }
 
+    // fill up array with nodes for compressed representation
+    struct Node * nodeArray[nodeArrayLength];
+    int nodeArrayIt = 0;
+    long unsigned int i;
+    for (i = 0 ; i < 128 ; i++) {
+        if (map[i] != 0) {
+            nodeArray[nodeArrayIt] = malloc(sizeof(struct Node));
+            nodeArray[nodeArrayIt]->c = getChar(i);
+            nodeArray[nodeArrayIt]->count = map[i];
+            nodeArrayIt++;
+        }
+    } 
+
+    // merge into one overarching tree of nodes
+    // O(N^2) - technically O(1) since we have
+    // at most 128 nodes, though. to-do: implement
+    // a priority queue to handle this later, maybe
+    // as a heap? possible O(N*lg(N)) improvement
+    int minimuma[2] = {-1, -1}
+    struct Node * toMerge[128];
+    int toMergeIt = 0;
+    
+
+
+    // free all space, close file, successful return
+    for (i = 0 ; i < nodeArrayLength ; i++) {
+        free(nodeArray[i]);
+    }
     fclose(f);
 	return 0;
 }
-
-struct Node {
-	// count (int): the number of times that every character in the
-	// subtree at this node's root occur in the program
-	int count;
-
-	// left (Node): the left subnode of this Node, if it exists
-	struct Node * left;
-
-	// right (Node): same as above but the right subnode, if it exists
-	struct Node * right;
-
-	// c (char): the character of this Node, if it exists
-	char c;
-};
 
 void printUsageString() {
 	printf("./binary_xyphos <input_file_name>\ninput_file_name should be the name of a text file.\n");
