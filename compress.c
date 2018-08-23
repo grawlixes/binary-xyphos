@@ -29,6 +29,58 @@ int main(int argc, char * argv[]) {
         printUsageString();
     }
 
+    // checking if filename.xyp exists in this directory already
+    // to avoid overwriting any previously existing files
+    // let the user name his or her own files later on
+    if (strlen(fileName) > 4) {
+        char * fileNameCut = malloc(strlen(fileName)*sizeof(char));
+        strcpy(fileNameCut, fileName);
+        fileNameCut[strlen(fileName)-4] = '\0';
+
+        char * fileNameCutXyp = malloc((strlen(fileNameCut)+4)*sizeof(char));
+        strncpy(fileNameCutXyp, fileNameCut, strlen(fileNameCut));
+        fileNameCutXyp[strlen(fileNameCut)] = '.';
+        fileNameCutXyp[strlen(fileNameCut)+1] = 'x';
+        fileNameCutXyp[strlen(fileNameCut)+2] = 'y';
+        fileNameCutXyp[strlen(fileNameCut)+3] = 'p';
+
+        FILE * fCheck = fopen(fileNameCutXyp, "r");
+
+        if (fCheck) {
+            printf("%s already exists in this directory.\nRemove it and " 
+                   "try again.\n", fileNameCutXyp);
+            free(fileNameCut);
+            free(fileNameCutXyp);
+            fclose(f);
+            fclose(fCheck);
+            return 1;
+        } else {
+            free(fileNameCut);
+            free(fileNameCutXyp);
+        }
+    }
+
+    char * fileNameXyp = malloc((strlen(fileName)+4)*sizeof(char));
+    strncpy(fileNameXyp, fileName, strlen(fileName));
+    fileNameXyp[strlen(fileName)] = '.';
+    fileNameXyp[strlen(fileName)+1] = 'x';
+    fileNameXyp[strlen(fileName)+2] = 'y';
+    fileNameXyp[strlen(fileName)+3] = 'p';
+
+    FILE * fCheckFull = fopen(fileNameXyp, "r");
+    if (fCheckFull) {
+        printf("%s already exists in this directory.\nRemove it and " 
+               "try again.\n", fileNameXyp);
+        free(fileNameXyp);
+        fclose(f);
+        fclose(fCheckFull);
+        return 1;
+    } else {
+        free(fileNameXyp);
+    }
+
+
+
     // supports all ASCII characters
     int map[128] = {0};
 
@@ -59,16 +111,18 @@ int main(int argc, char * argv[]) {
         }
     } 
 
+    
+
     // merge into one overarching tree of nodes
     // O(N^2) - technically O(1) since we have
     // at most 128 nodes, though. to-do: implement
     // a priority queue to handle this later, maybe
     // as a heap? possible O(N*lg(N)) improvement
-    int minimuma[2] = {-1, -1}
+    int minis[2] = {-1, -1};
     struct Node * toMerge[128];
     int toMergeIt = 0;
     
-
+     
 
     // free all space, close file, successful return
     for (i = 0 ; i < nodeArrayLength ; i++) {
