@@ -31,7 +31,8 @@ int main(int argc, char * argv[]) {
 
     // checking if filename.xyp exists in this directory already
     // to avoid overwriting any previously existing files
-    // let the user name his or her own files later on
+    // let the user name his or her own files later on because
+    // this is honestly a little inefficient lol
     if (strlen(fileName) > 4) {
         char * fileNameCut = malloc(strlen(fileName)*sizeof(char));
         strcpy(fileNameCut, fileName);
@@ -111,29 +112,79 @@ int main(int argc, char * argv[]) {
         }
     } 
 
-    
-
     // merge into one overarching tree of nodes
     // O(N^2) - technically O(1) since we have
-    // at most 128 nodes, though. to-do: implement
-    // a priority queue to handle this later, maybe
-    // as a heap? possible O(N*lg(N)) improvement
+    // at most 128 nodes, though. also, the time is
+    // really closer to 1/2 * N^2 since we have this
+    // time complexity from the arithmetic series.
+
+    // to-do: implement a priority queue to handle 
+    // this later, maybe as a heap? possible 
+    // O(N*lg(N)) improvement if this is done
     int minis[2] = {-1, -1};
-    struct Node * toMerge[128];
-    int toMergeIt = 0;
+    struct Node * toMerge[nodeArrayLength];
     
-     
+    while (nodeArrayLength > 1) {
+        int it;
+        for (it = 0 ; it < nodeArrayLength ; it++) {
+            if (minis[0] == -1) {
+                minis[0] = it;
+            } else if (nodeArray[it]->count < minis[0]) {
+                minis[1] = minis[0];
+                minis[0] = it;
+            } else if (minis[1] == -1) {
+                minis[1] = it;
+            } else if (nodeArray[it]->count < minis[1]) {
+                minis[1] = it;
+            }
+        }
+
+        struct Node * mergedNode = malloc(sizeof(struct Node));
+        mergedNode->left = nodeArray[minis[0]];
+        mergedNode->right = nodeArray[minis[1]];
+        mergedNode->count = mergedNode->left->count + mergedNode->right->count;
+
+        int choose = minis[0];
+        int other = minis[1];
+        if (minis[1] < minis[0]) {
+            choose = minis[1];
+            other = minis[0];
+        }
+
+        // this combines the two minimal nodes and essentially
+        // stops considering them; does this by replacing one of
+        // the minimal nodes with our merged node, replacing the
+        // other with the final node in the window, and then 
+        // decreases the window size by one. this effectively deletes
+        // both of the minimal nodes without actually removing
+        // them from the heap, which would destroy their data
+        nodeArray[choose] = mergedNode;
+        nodeArray[other] = nodeArray[nodeArrayLength-1];
+        nodeArrayLength -= 1;
+    }
+
+    // at this point, nodeArray[0] should be the final
+    // Huffman tree that will tell us how to evaluate
+    // each character in the compressed file. we're going
+    // to write the compressed form of each character to
+    // our <fileName>.xyp (compressed) file, as well as
+    // the encoding from this tree so that the decompressor
+    // can handle it when it is used on <fileName>.xyp
+
+
 
     // free all space, close file, successful return
     for (i = 0 ; i < nodeArrayLength ; i++) {
         free(nodeArray[i]);
     }
+
     fclose(f);
 	return 0;
 }
 
 void printUsageString() {
-	printf("./binary_xyphos <input_file_name>\ninput_file_name should be the name of a text file.\n");
+	printf("./binary_xyphos <input_file_name>\ninput_file_name should be the "
+           "name of a text file, and <input_file_name>.xyp shouldn't exist\n");
 	exit(1);
 }
 
