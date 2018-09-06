@@ -28,6 +28,9 @@ information below text level; in Binary Xyphos, I'm compressing at the
 binary level. This showcases both my program's efficiency and my 
 top-tier project naming skills.
 
+The only problem I see arising from this new iteration is lack of portability.
+I'm not really sure how to address that, but I don't really care - just use C11.
+
 # overhead
 To be honest, I actually don't know how much better the overhead will be
 for Binary Xyphos vs. original Xyphos. The original Xyphos just placed a lot of

@@ -24,6 +24,8 @@ compress.o : compress.c
 
 
 # clean
+ccomp : clean
+	rm -f *.xyp
 clean :
 	rm -f compress compress.o
 

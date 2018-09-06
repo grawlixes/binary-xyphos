@@ -4,14 +4,15 @@
 #include <string.h>
 
 // print_usage_string() (void): prints the correct way of calling the
-// executable to stout
-void printUsageString();
+// executable to stout void printUsageString();
 
 // getChar(int i) (char): returns the ASCII character of the value i
 char getChar(int i);
 
 // getInt(char c) (int): returns the ASCII value of the character c
 int getInt(char c);
+
+void printUsageString();
 
 int main(int argc, char * argv[]) {
 	// read through the file to get the count of all numbers
@@ -99,6 +100,8 @@ int main(int argc, char * argv[]) {
         }
     }
 
+    fclose(f);
+
     // fill up array with nodes for compressed representation
     struct Node * nodeArray[nodeArrayLength];
     int nodeArrayIt = 0;
@@ -123,7 +126,8 @@ int main(int argc, char * argv[]) {
     // O(N*lg(N)) improvement if this is done
     int minis[2] = {-1, -1};
     struct Node * toMerge[nodeArrayLength];
-    
+    int originalNodeArrayLength = nodeArrayLength;
+
     while (nodeArrayLength > 1) {
         int it;
         for (it = 0 ; it < nodeArrayLength ; it++) {
@@ -171,15 +175,43 @@ int main(int argc, char * argv[]) {
     // the encoding from this tree so that the decompressor
     // can handle it when it is used on <fileName>.xyp
 
-
-
-    // free all space, close file, successful return
-    for (i = 0 ; i < nodeArrayLength ; i++) {
-        free(nodeArray[i]);
+    // first decide how to name output file
+    int success = 0;
+    for (i = 0; i < strlen(fileName); i++) {
+        if (fileName[i] == '.') {
+            success = 1;
+            break;
+        }
     }
 
-    fclose(f);
-	return 0;
+    char newFileName[strlen(fileName)+4];
+    if (!success) {
+        for (i = 0; i < strlen(fileName); i++) {
+            newFileName[i] = fileName[i];
+        }
+
+        newFileName[strlen(fileName)] = '.';
+        newFileName[strlen(fileName)+1] = 'x';
+        newFileName[strlen(fileName)+2] = 'y';
+        newFileName[strlen(fileName)+3] = 'p';
+    } else {
+        for (i = 0; i < strlen(fileName)-4; i++) {
+            newFileName[i] = fileName[i];
+        }
+
+        newFileName[strlen(fileName)-4] = '.';
+        newFileName[strlen(fileName)-3] = 'x';
+        newFileName[strlen(fileName)-2] = 'y';
+        newFileName[strlen(fileName)-1] = 'p';
+    }
+
+    // testing file output for now
+    // need to write binary values to save space
+
+    FILE * output = fopen(newFileName, "w");
+    fclose(output);
+
+    return 0;
 }
 
 void printUsageString() {
