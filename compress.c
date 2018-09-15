@@ -209,6 +209,29 @@ int main(int argc, char * argv[]) {
     // need to write binary values to save space
 
     FILE * output = fopen(newFileName, "w");
+    for (i = 0; i < 128; i++) {
+        if (map[i] > 0) {
+            char buf1[2];
+            buf1[0] = '\0'+i;
+            buf1[1] = ':';
+
+            int secondBufSize = 1;
+            int copy = map[i];
+            while (copy/10 > 0) {
+                copy /= 10;
+                secondBufSize += 1;
+            }
+            char * buf = malloc(sizeof(char)*secondBufSize);
+            printf("%i, %i    ", map[i], secondBufSize);
+            while (secondBufSize > 0) {
+                buf[secondBufSize-1] = '0' + (map[i] - (map[i]/10)*10);
+                map[i] /= 10;
+                secondBufSize -= 1;
+            }
+            free(buf);
+        }
+    }     
+
     fclose(output);
 
     return 0;
