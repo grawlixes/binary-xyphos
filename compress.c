@@ -208,12 +208,41 @@ int main(int argc, char * argv[]) {
     // testing file output for now
     // need to write binary values to save space
 
-    FILE * output = fopen(newFileName, "w");
+    FILE * output;
+    output = fopen(newFileName, "w");
+
+    /* this might work but I'll save it for later
+    fwrite(map, sizeof(map), 1, output);
+    */
+
+    /* write char counts and recreate full binary
+     * tree instead of trying to write the tree
+     * itself, since building it doesn't take long 
+     * */
+    int first = 1;
     for (i = 0; i < 128; i++) {
         if (map[i] > 0) {
-            char buf1[2];
-            buf1[0] = '\0'+i;
-            buf1[1] = ':';
+            if (!first) {
+                char space = ' ';
+                fwrite(&space, sizeof(char), 1, output);
+             } else {
+                first = 0;
+             }
+
+            int j;            
+            if (i >= 100) { 
+                j = 3;
+            } else if (i >= 10) {
+                j = 2;
+            } else {
+                j = 1;
+            }
+
+            char buf1[j+1];
+            sprintf(buf1, "%lu", i);
+            buf1[j] = ':';
+
+            fwrite(buf1, sizeof(char), j+1, output);
 
             int secondBufSize = 1;
             int copy = map[i];
@@ -221,16 +250,24 @@ int main(int argc, char * argv[]) {
                 copy /= 10;
                 secondBufSize += 1;
             }
+            int ogsbs = secondBufSize;
+
             char * buf = malloc(sizeof(char)*secondBufSize);
-            printf("%i, %i    ", map[i], secondBufSize);
             while (secondBufSize > 0) {
                 buf[secondBufSize-1] = '0' + (map[i] - (map[i]/10)*10);
                 map[i] /= 10;
                 secondBufSize -= 1;
             }
+
+            fwrite(buf, sizeof(char), ogsbs, output);
             free(buf);
         }
     }     
+    char newline = '\n';
+    fwrite(&newline, sizeof(char), 1, output);
+
+    /* now write the actual compressed contents */
+    
 
     fclose(output);
 
