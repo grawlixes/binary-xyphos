@@ -14,6 +14,10 @@ int getInt(char c);
 
 void printUsageString();
 
+void transformHelper(int map[128], struct Node * huffNode, int mapping);
+
+void transformMap(int map[128], struct Node * huffTree);
+
 int main(int argc, char * argv[]) {
 	// read through the file to get the count of all numbers
 
@@ -99,7 +103,6 @@ int main(int argc, char * argv[]) {
             map[getInt(line[i])]++;
         }
     }
-
     fclose(f);
 
     // fill up array with nodes for compressed representation
@@ -111,6 +114,8 @@ int main(int argc, char * argv[]) {
             nodeArray[nodeArrayIt] = malloc(sizeof(struct Node));
             nodeArray[nodeArrayIt]->c = getChar(i);
             nodeArray[nodeArrayIt]->count = map[i];
+            nodeArray[nodeArrayIt]->left = NULL;
+            nodeArray[nodeArrayIt]->right = NULL;
             nodeArrayIt++;
         }
     } 
@@ -127,7 +132,6 @@ int main(int argc, char * argv[]) {
     int minis[2] = {-1, -1};
     struct Node * toMerge[nodeArrayLength];
     int originalNodeArrayLength = nodeArrayLength;
-
     while (nodeArrayLength > 1) {
         int it;
         for (it = 0 ; it < nodeArrayLength ; it++) {
@@ -184,7 +188,7 @@ int main(int argc, char * argv[]) {
         }
     }
 
-    char newFileName[strlen(fileName)+4];
+    char * newFileName = malloc(strlen(fileName)+4);
     if (!success) {
         for (i = 0; i < strlen(fileName); i++) {
             newFileName[i] = fileName[i];
@@ -195,21 +199,34 @@ int main(int argc, char * argv[]) {
         newFileName[strlen(fileName)+2] = 'y';
         newFileName[strlen(fileName)+3] = 'p';
     } else {
+
+        strncpy(fileName, newFileName, strlen(fileName)-4);
+
+        printf("OFN %s\n", fileName);
+        printf("NFN %s\n", newFileName);
+        /*
         for (i = 0; i < strlen(fileName)-4; i++) {
             newFileName[i] = fileName[i];
         }
+        printf("%s\n", newFileName);
 
         newFileName[strlen(fileName)-4] = '.';
+        printf("%s\n", newFileName);
         newFileName[strlen(fileName)-3] = 'x';
+        printf("%s\n", newFileName);
         newFileName[strlen(fileName)-2] = 'y';
+        printf("%s\n", newFileName);
         newFileName[strlen(fileName)-1] = 'p';
-    }
+        printf("%s\n", newFileName);
+*/    }
 
     // testing file output for now
     // need to write binary values to save space
 
     FILE * output;
     output = fopen(newFileName, "w");
+    free(newFileName);
+
 
     /* this might work but I'll save it for later
     fwrite(map, sizeof(map), 1, output);
@@ -266,12 +283,54 @@ int main(int argc, char * argv[]) {
     char newline = '\n';
     fwrite(&newline, sizeof(char), 1, output);
 
+    int asdf;
+    for (asdf = 0; asdf < 128; asdf++) {
+        printf("%i ", map[asdf]);
+    }
+    printf("\n");
     /* now write the actual compressed contents */
-    
+    transformMap(map, nodeArray[0]); 
 
+    for (asdf = 0; asdf < 128; asdf++) {
+        printf("%i ", map[asdf]);
+    }
+    printf("\n");
     fclose(output);
 
     return 0;
+}
+
+void transformMap(int map[128], struct Node * huffTree) {
+    // call transformHelper recursively?
+
+    if (huffTree->left != NULL) {
+        printf("Start: Descending down left\n");
+        transformHelper(map, huffTree->left, 0);
+    }
+    if (huffTree->right != NULL) {
+        printf("Start: descending down right\n");
+        transformHelper(map, huffTree->right, 1);
+    }
+
+    if (huffTree->c) {
+        map[huffTree->c] = 1;
+    }
+}
+
+void transformHelper(int map[128], struct Node * huffNode, int mapping) {
+    if (huffNode->c) {
+        printf("%c\n", huffNode->c);
+        map[huffNode->c] = mapping;
+    } else {
+        if (huffNode->left != NULL) {
+            printf("Current mapping is %i, %i going left\n", mapping, huffNode->count);
+            transformHelper(map, huffNode->left, (mapping << 1));
+        }
+        if (huffNode->right != NULL) {
+            printf("Current mapping is %i, %i going right\n", mapping, huffNode->count);
+            transformHelper(map, huffNode->right, ((mapping << 1)+1));
+        }
+    }
 }
 
 void printUsageString() {
