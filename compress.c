@@ -188,37 +188,16 @@ int main(int argc, char * argv[]) {
         }
     }
 
-    char * newFileName = malloc(strlen(fileName)+4);
+    char * newFileName;
     if (!success) {
-        for (i = 0; i < strlen(fileName); i++) {
-            newFileName[i] = fileName[i];
-        }
-
-        newFileName[strlen(fileName)] = '.';
-        newFileName[strlen(fileName)+1] = 'x';
-        newFileName[strlen(fileName)+2] = 'y';
-        newFileName[strlen(fileName)+3] = 'p';
+        newFileName = malloc(strlen(fileName)+4);
+        strncpy(newFileName, fileName, strlen(fileName));
+        strcpy(newFileName+strlen(fileName), ".xyp");
     } else {
-
-        strncpy(fileName, newFileName, strlen(fileName)-4);
-
-        printf("OFN %s\n", fileName);
-        printf("NFN %s\n", newFileName);
-        /*
-        for (i = 0; i < strlen(fileName)-4; i++) {
-            newFileName[i] = fileName[i];
-        }
-        printf("%s\n", newFileName);
-
-        newFileName[strlen(fileName)-4] = '.';
-        printf("%s\n", newFileName);
-        newFileName[strlen(fileName)-3] = 'x';
-        printf("%s\n", newFileName);
-        newFileName[strlen(fileName)-2] = 'y';
-        printf("%s\n", newFileName);
-        newFileName[strlen(fileName)-1] = 'p';
-        printf("%s\n", newFileName);
-*/    }
+        newFileName = malloc(strlen(fileName));
+        strncpy(newFileName, fileName, strlen(fileName)-4);
+        strcpy(newFileName+strlen(fileName)-4, ".xyp");
+    }
 
     // testing file output for now
     // need to write binary values to save space
@@ -282,7 +261,7 @@ int main(int argc, char * argv[]) {
     }     
     char newline = '\n';
     fwrite(&newline, sizeof(char), 1, output);
-
+    return 0;
     int asdf;
     for (asdf = 0; asdf < 128; asdf++) {
         printf("%i ", map[asdf]);
