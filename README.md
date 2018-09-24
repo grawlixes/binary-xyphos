@@ -42,4 +42,8 @@ how much until I get a little further.
 # info
 See this link for more information: https://www2.cs.duke.edu/csed/poop/huff/info/
 
-This program isn't done yet!
+This program isn't done yet! I am committed to finish the compressor by 
+the start of October, though. The decompressor should be done (not so?)
+shortly after the compressor. My priority is making sure I'm representing
+the Huffman values correctly; as long as I know the compressor works, 
+I'll be satisfied for a short while since this is just a passion project.
