@@ -118,7 +118,7 @@ int main(int argc, char * argv[]) {
             nodeArray[nodeArrayIt]->right = NULL;
             nodeArrayIt++;
         }
-    } 
+    }
 
     // merge into one overarching tree of nodes
     // O(N^2) - technically O(1) since we have
@@ -137,12 +137,12 @@ int main(int argc, char * argv[]) {
         for (it = 0 ; it < nodeArrayLength ; it++) {
             if (minis[0] == -1) {
                 minis[0] = it;
-            } else if (nodeArray[it]->count < minis[0]) {
+            } else if (nodeArray[it]->count < nodeArray[minis[0]]->count) {
                 minis[1] = minis[0];
                 minis[0] = it;
             } else if (minis[1] == -1) {
                 minis[1] = it;
-            } else if (nodeArray[it]->count < minis[1]) {
+            } else if (nodeArray[it]->count < nodeArray[minis[1]]->count) {
                 minis[1] = it;
             }
         }
@@ -150,6 +150,7 @@ int main(int argc, char * argv[]) {
         struct Node * mergedNode = malloc(sizeof(struct Node));
         mergedNode->left = nodeArray[minis[0]];
         mergedNode->right = nodeArray[minis[1]];
+        mergedNode->c = '\0';
         mergedNode->count = mergedNode->left->count + mergedNode->right->count;
 
         int choose = minis[0];
@@ -169,6 +170,7 @@ int main(int argc, char * argv[]) {
         nodeArray[choose] = mergedNode;
         nodeArray[other] = nodeArray[nodeArrayLength-1];
         nodeArrayLength -= 1;
+        minis[0] = minis[1] = -1;
     }
 
     // at this point, nodeArray[0] should be the final
@@ -261,20 +263,16 @@ int main(int argc, char * argv[]) {
     }     
     char newline = '\n';
     fwrite(&newline, sizeof(char), 1, output);
-    return 0;
-    int asdf;
-    for (asdf = 0; asdf < 128; asdf++) {
-        printf("%i ", map[asdf]);
-    }
-    printf("\n");
+
     /* now write the actual compressed contents */
     transformMap(map, nodeArray[0]); 
 
-    for (asdf = 0; asdf < 128; asdf++) {
-        printf("%i ", map[asdf]);
-    }
-    printf("\n");
     fclose(output);
+
+    int a;
+    for (a = 0; a < 128; a++) {
+        printf("%i ", map[a]);
+    } printf("\n");
 
     return 0;
 }
@@ -283,11 +281,11 @@ void transformMap(int map[128], struct Node * huffTree) {
     // call transformHelper recursively?
 
     if (huffTree->left != NULL) {
-        printf("Start: Descending down left\n");
+        printf("Start: Descending down left, %i\n", huffTree->count);
         transformHelper(map, huffTree->left, 0);
     }
     if (huffTree->right != NULL) {
-        printf("Start: descending down right\n");
+        printf("Start: descending down right, %i\n", huffTree->count);
         transformHelper(map, huffTree->right, 1);
     }
 
@@ -297,8 +295,8 @@ void transformMap(int map[128], struct Node * huffTree) {
 }
 
 void transformHelper(int map[128], struct Node * huffNode, int mapping) {
-    if (huffNode->c) {
-        printf("%c\n", huffNode->c);
+    if (huffNode->c != '\0') {
+        printf("%c, %i\n", huffNode->c, huffNode->count);
         map[huffNode->c] = mapping;
     } else {
         if (huffNode->left != NULL) {
