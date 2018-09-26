@@ -1,8 +1,6 @@
 # "make" creates the executables
 # "make clean" removes the executables and object files
 
-
-
 # the compressor
 
 # usage: "./compress <input> <output>" compresses the input file, where
@@ -22,11 +20,17 @@ compress.o : compress.c
 # 	 the file is a special ".xyp" file made by the compressor
 
 
+# test
+
+test : test.o
+	gcc -g -Wall test.o -o test
+test.o : test.c
+	gcc -c test.c
 
 # clean
 clean2 : clean
 	rm -f *.xyp
 clean :
-	rm -f compress compress.o
+	rm -f compress compress.o test test.o
 
 # instructions go here #

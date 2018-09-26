@@ -14,9 +14,9 @@ int getInt(char c);
 
 void printUsageString();
 
-void transformHelper(int map[128], struct Node * huffNode, int mapping);
+void transformHelper(int map[128][2], struct Node * huffNode, int mapping, int ct);
 
-void transformMap(int map[128], struct Node * huffTree);
+void transformMap(int map[128][2], struct Node * huffTree);
 
 int main(int argc, char * argv[]) {
 	// read through the file to get the count of all numbers
@@ -132,6 +132,7 @@ int main(int argc, char * argv[]) {
     int minis[2] = {-1, -1};
     struct Node * toMerge[nodeArrayLength];
     int originalNodeArrayLength = nodeArrayLength;
+    printf("%i\n", nodeArrayLength);
     while (nodeArrayLength > 1) {
         int it;
         for (it = 0 ; it < nodeArrayLength ; it++) {
@@ -145,13 +146,14 @@ int main(int argc, char * argv[]) {
             } else if (nodeArray[it]->count < nodeArray[minis[1]]->count) {
                 minis[1] = it;
             }
+            printf("%c %i | %i %i | \n", nodeArray[it]->c, nodeArray[it]->count, minis[0], minis[1]);
         }
-
         struct Node * mergedNode = malloc(sizeof(struct Node));
         mergedNode->left = nodeArray[minis[0]];
         mergedNode->right = nodeArray[minis[1]];
         mergedNode->c = '\0';
         mergedNode->count = mergedNode->left->count + mergedNode->right->count;
+        printf("%c %i, %c %i \n  ",nodeArray[minis[0]]->c,nodeArray[minis[0]]->count, nodeArray[minis[1]]->c, nodeArray[minis[1]]->count);
 
         int choose = minis[0];
         int other = minis[1];
@@ -159,7 +161,6 @@ int main(int argc, char * argv[]) {
             choose = minis[1];
             other = minis[0];
         }
-
         // this combines the two minimal nodes and essentially
         // stops considering them; does this by replacing one of
         // the minimal nodes with our merged node, replacing the
@@ -171,8 +172,8 @@ int main(int argc, char * argv[]) {
         nodeArray[other] = nodeArray[nodeArrayLength-1];
         nodeArrayLength -= 1;
         minis[0] = minis[1] = -1;
+        printf("\n");
     }
-
     // at this point, nodeArray[0] should be the final
     // Huffman tree that will tell us how to evaluate
     // each character in the compressed file. we're going
@@ -264,48 +265,65 @@ int main(int argc, char * argv[]) {
     char newline = '\n';
     fwrite(&newline, sizeof(char), 1, output);
 
+    int newMap[128][2] = {{0, 0}};
+
     /* now write the actual compressed contents */
-    transformMap(map, nodeArray[0]); 
+    transformMap(newMap, nodeArray[0]); 
 
     fclose(output);
 
-    int a;
-    for (a = 0; a < 128; a++) {
-        printf("%i ", map[a]);
-    } printf("\n");
+    // for each character we read, write its compressed
+    // form to the output file by checking newMap
+    FILE * input = fopen(fileName, "r");
+    line = NULL;
+    size_t lineLen;
+    unsigned char curByte = 0;
+    int curByteSize = 8;
+    while (getline(&line, &lineLen, input) != -1) {
+        int it;
+        for (it = 0; it < lineLen; it++) {
+            char put = line[it];
+            int encoding = newMap[put][0];
+            int length = newMap[put][0];
+
+            if (length > curByteSize) {
+                
+            }
+        }
+    }
 
     return 0;
 }
 
-void transformMap(int map[128], struct Node * huffTree) {
-    // call transformHelper recursively?
-
+void transformMap(int map[128][2], struct Node * huffTree) {
     if (huffTree->left != NULL) {
         printf("Start: Descending down left, %i\n", huffTree->count);
-        transformHelper(map, huffTree->left, 0);
+        transformHelper(map, huffTree->left, 0, 1);
     }
     if (huffTree->right != NULL) {
         printf("Start: descending down right, %i\n", huffTree->count);
-        transformHelper(map, huffTree->right, 1);
+        transformHelper(map, huffTree->right, 1, 1);
     }
 
-    if (huffTree->c) {
-        map[huffTree->c] = 1;
+    if (huffTree->c != '\0') {
+        map[huffTree->c][0] = 1;
+        map[huffTree->c][1] = 1;
     }
 }
 
-void transformHelper(int map[128], struct Node * huffNode, int mapping) {
+void transformHelper(int map[128][2], struct Node * huffNode, int mapping, int ct) {
     if (huffNode->c != '\0') {
-        printf("%c, %i\n", huffNode->c, huffNode->count);
-        map[huffNode->c] = mapping;
+        printf("%c, %i, %i\n", huffNode->c, huffNode->count, ct);
+        map[huffNode->c][0] = mapping;
+        map[huffNode->c][1] = ct;
     } else {
         if (huffNode->left != NULL) {
             printf("Current mapping is %i, %i going left\n", mapping, huffNode->count);
-            transformHelper(map, huffNode->left, (mapping << 1));
+            transformHelper(map, huffNode->left, (mapping << 1), ct+1);
         }
         if (huffNode->right != NULL) {
             printf("Current mapping is %i, %i going right\n", mapping, huffNode->count);
-            transformHelper(map, huffNode->right, ((mapping << 1)+1));
+            transformHelper(map, huffNode->right, ((mapping << 1)+1), ct+1);
         }
     }
 }
