@@ -14,9 +14,9 @@ int getInt(char c);
 
 void printUsageString();
 
-void transformHelper(int map[128][2], struct Node * huffNode, int mapping, int ct);
+void transformHelper(int map[128][3], struct Node * huffNode, int mapping, int ct);
 
-void transformMap(int map[128][2], struct Node * huffTree);
+void transformMap(int map[128][3], struct Node * huffTree);
 
 int main(int argc, char * argv[]) {
 	// read through the file to get the count of all numbers
@@ -89,6 +89,7 @@ int main(int argc, char * argv[]) {
 
     // supports all ASCII characters
     int map[128] = {0};
+    int newMap[128][3] = {{0, 0, 0}};
 
     // go line-by-line, char-by-char and fill up the map
     char * line = NULL;
@@ -111,6 +112,7 @@ int main(int argc, char * argv[]) {
     long unsigned int i;
     for (i = 0 ; i < 128 ; i++) {
         if (map[i] != 0) {
+            newMap[i][2] = map[i];
             nodeArray[nodeArrayIt] = malloc(sizeof(struct Node));
             nodeArray[nodeArrayIt]->c = getChar(i);
             nodeArray[nodeArrayIt]->count = map[i];
@@ -265,12 +267,8 @@ int main(int argc, char * argv[]) {
     char newline = '\n';
     fwrite(&newline, sizeof(char), 1, output);
 
-    int newMap[128][2] = {{0, 0}};
-
     /* now write the actual compressed contents */
     transformMap(newMap, nodeArray[0]); 
-
-    fclose(output);
 
     // for each character we read, write its compressed
     // form to the output file by checking newMap
@@ -281,27 +279,53 @@ int main(int argc, char * argv[]) {
     int curByteSize = 8;
     while (getline(&line, &lineLen, input) != -1) {
         int it;
-        for (it = 0; it < lineLen; it++) {
+        for (it = 0; it < strlen(line); it++) {
             char put = line[it];
             int encoding = newMap[put][0];
-            int length = newMap[put][0];
+            int length = newMap[put][1];
 
-            if (length > curByteSize) {
-                
+            while (length > 0) {
+                if (length <= curByteSize) {
+                    int offset = curByteSize-length;
+                    curByte |= (encoding << offset);
+                    curByteSize -= length;
+                    if (curByteSize == 0) {
+                        fwrite(&curByte, 1, 1, output);
+                        curByte = 0;
+                        curByteSize = 8;
+                    }
+                    length = 0;
+                } else {
+                    // bits to store in the first byte
+                    // mask however much of the encoding
+                    // we can fit and store it in the 
+                    // rest of the first section
+
+                    int preCut = encoding & (((1 << curByteSize)-1) << 
+                                            (length-curByteSize));
+                    curByte |= (preCut >> (length-curByteSize));
+                    encoding &= ((1 << curByteSize)-1);
+                    length -= curByteSize;
+                    fwrite(&curByte, 1, 1, output);
+                    curByte = 0;
+                    curByteSize = 8;
+                }
             }
         }
+    }
+
+    if (curByteSize < 8) {
+        fwrite(&curByte, 1, 1, output);
     }
 
     return 0;
 }
 
-void transformMap(int map[128][2], struct Node * huffTree) {
+void transformMap(int map[128][3], struct Node * huffTree) {
     if (huffTree->left != NULL) {
-        printf("Start: Descending down left, %i\n", huffTree->count);
         transformHelper(map, huffTree->left, 0, 1);
     }
     if (huffTree->right != NULL) {
-        printf("Start: descending down right, %i\n", huffTree->count);
         transformHelper(map, huffTree->right, 1, 1);
     }
 
@@ -311,18 +335,15 @@ void transformMap(int map[128][2], struct Node * huffTree) {
     }
 }
 
-void transformHelper(int map[128][2], struct Node * huffNode, int mapping, int ct) {
+void transformHelper(int map[128][3], struct Node * huffNode, int mapping, int ct) {
     if (huffNode->c != '\0') {
-        printf("%c, %i, %i\n", huffNode->c, huffNode->count, ct);
         map[huffNode->c][0] = mapping;
         map[huffNode->c][1] = ct;
     } else {
         if (huffNode->left != NULL) {
-            printf("Current mapping is %i, %i going left\n", mapping, huffNode->count);
             transformHelper(map, huffNode->left, (mapping << 1), ct+1);
         }
         if (huffNode->right != NULL) {
-            printf("Current mapping is %i, %i going right\n", mapping, huffNode->count);
             transformHelper(map, huffNode->right, ((mapping << 1)+1), ct+1);
         }
     }
