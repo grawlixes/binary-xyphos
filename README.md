@@ -48,6 +48,7 @@ is, and it looks like the Huffman method worked perfectly. Here's a to-do list.
 
 # to do
 COMPRESSOR:
+
 	- Add the total weight of the compressed document so I don't have to
 	  deal with a pseudo-EOF character. This will make things a bit easier
 	  since I'm trying to support all edge cases and characters.
@@ -60,6 +61,7 @@ COMPRESSOR:
 	  I have a plan for this already, but I have a lot to do before I can
 	  get started.
 DECOMPRESSOR:
+
 	- Start! I'm swamped with exams and homework right now, but I want it
 	  to be done (or close to done) before the semester ends. I'm pretty
 	  confident that I can finish in this time.
