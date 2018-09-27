@@ -42,8 +42,24 @@ how much until I get a little further.
 # info
 See this link for more information: https://www2.cs.duke.edu/csed/poop/huff/info/
 
-This program isn't done yet! I am committed to finish the compressor by 
-the start of October, though. The decompressor should be done (not so?)
-shortly after the compressor. My priority is making sure I'm representing
-the Huffman values correctly; as long as I know the compressor works, 
-I'll be satisfied for a short while since this is just a passion project.
+This program isn't done yet! I just finished the compressor for this program. I ran a 
+few test (some automated, some not) to see how efficient and accurate the compression
+is, and it looks like the Huffman method worked perfectly. Here's a to-do list.
+
+# to do
+COMPRESSOR:
+	- Add the total weight of the compressed document so I don't have to
+	  deal with a pseudo-EOF character. This will make things a bit easier
+	  since I'm trying to support all edge cases and characters.
+	- Add more support for Unicode characters. Currently works for ASCII.
+	  I haven't tried using Unicode characters yet.
+	- Use a Priority Queue to select Huffman nodes while building the tree.
+	  This will decrease the time complexity of building the tree from 
+	  O(N^2) to O(N lg(N)).
+	- Use LZ 77 method on .xyp file compressed data for even more efficiency.
+	  I have a plan for this already, but I have a lot to do before I can
+	  get started.
+DECOMPRESSOR:
+	- Start! I'm swamped with exams and homework right now, but I want it
+	  to be done (or close to done) before the semester ends. I'm pretty
+	  confident that I can finish in this time.
